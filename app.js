@@ -10,10 +10,6 @@ app.use(express.urlencoded({ extended: true }));
 
 connectToDB();
 
-app.get("/", userRoutes);
-app.post("/createUser", userRoutes);
-app.get("/getUsers", userRoutes);
-app.post("/editUser/:id", userRoutes);
-app.delete("/deleteUser/:id", userRoutes);
+app.use("/", userRoutes);
 
 module.exports = app;
