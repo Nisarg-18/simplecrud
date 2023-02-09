@@ -1,4 +1,39 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+
 const UserList = () => {
+  const [userData, setUserData] = useState(null);
+
+  const fetchUserData = async () => {
+    const resp = await axios.get("/getUsers");
+
+    if (resp.data.users.length > 0) {
+      setUserData(resp.data.users);
+    }
+  };
+
+  const deleteUser = async (id) => {
+    const delResp = await axios.delete(`/deleteUser/${id}`);
+    fetchUserData();
+  };
+
+  const editUser = async (user) => {
+    const newName = prompt("Enter new name");
+    const newMail = prompt("Enter new mail");
+    if (!newName || !newMail) {
+      alert("both fields are required");
+    } else {
+      const editResp = await axios.put(`/editUser/${user._id}`, {
+        name: newName,
+        email: newMail,
+      });
+      fetchUserData();
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto">
@@ -26,16 +61,33 @@ const UserList = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="px-4 py-3">Name</td>
-                <td className="px-4 py-3">Email</td>
-                <td className="px-4 py-3">
-                  <button className="hover:text-green-500">Edit</button>
-                </td>
-                <td className="px-4 py-3 text-lg text-gray-900">
-                  <button className="hover:text-red-500">Delete</button>
-                </td>
-              </tr>
+              {userData &&
+                userData.map((user, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-3">{user.name}</td>
+                    <td className="px-4 py-3">{user.email}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => {
+                          editUser(user);
+                        }}
+                        className="hover:text-green-500"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-lg text-gray-900">
+                      <button
+                        onClick={() => {
+                          deleteUser(user._id);
+                        }}
+                        className="hover:text-red-500"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
